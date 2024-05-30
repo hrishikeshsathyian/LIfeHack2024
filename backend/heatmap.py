@@ -6,6 +6,7 @@ import numpy as np
 
 # Load the data, normalize intensity and convert time to datetime
 crime_data = pd.read_csv('backend/stats/fake_crime_data_north_singapore.csv')
+
 crime_data['severity'] = crime_data['severity'] / 10
 crime_data['time'] = pd.to_datetime(crime_data['time'])
 
@@ -17,11 +18,14 @@ intensity = crime_data['severity'].values
 kde = KernelDensity(kernel='gaussian', bandwidth=0.01).fit(coords, sample_weight=intensity)
 
 
+# Time weighting function with hour-based difference
 def time_weighting(crime_time, current_time, sigma=1):
-    # Calculate the time difference in hours
-    time_diff = abs((crime_time - current_time).total_seconds()) / 3600
-    # Apply Gaussian weight
+    crime_hour = crime_time.hour + crime_time.minute / 60
+    current_hour = current_time.hour + current_time.minute / 60
+    time_diff = abs(crime_hour - current_hour)
+    print(f"Crime Hour: {crime_hour}, Current Hour: {current_hour}, Time Difference: {time_diff}")
     weight = np.exp(-time_diff**2 / (2 * sigma**2))
+    print(f"Weight: {weight}")
     return weight
 
 # Get the current time
@@ -34,6 +38,8 @@ crime_data['weighted_intensity'] = crime_data['severity'] * crime_data['time_wei
 # Recalculate KDE with time-weighted intensities
 coords = crime_data[['latitude', 'longitude']].values
 weighted_intensity = crime_data['weighted_intensity'].values
+# Remove any zero weights
+crime_data = crime_data[crime_data['weighted_intensity'] > 0]
 
 kde = KernelDensity(kernel='gaussian', bandwidth=0.01).fit(coords, sample_weight=weighted_intensity)
 
@@ -53,4 +59,5 @@ plt.imshow(z, origin='lower', extent=[x_min, x_max, y_min, y_max], cmap='hot', a
 plt.scatter(coords[:, 0], coords[:, 1], c='blue', s=10)
 plt.colorbar()
 plt.show()
+
 
