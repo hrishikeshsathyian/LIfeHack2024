@@ -8,11 +8,11 @@ The Patrol Planner web application utilizes past crime data to suggest optimal p
 To install the necessary dependencies, follow these steps:
 
 1. From the root directory, run the following command to install Python dependencies:
-pip install -r requirements.txt
+   `pip install -r requirements.txt`
 
-2. Navigate to the `/patrolplanner` directory and run the following command to install Node.js dependencies:
- cd patrolplanner 
- npm install
+3. Navigate to the `/patrolplanner` directory and run the following command to install Node.js dependencies:
+ `cd patrolplanner`
+ `npm install`
 
 
 ## Starting the Servers
@@ -21,13 +21,13 @@ To start the backend server, follow these steps:
 
 1. Navigate to the `/backend` directory.
 2. Run the following command to start the backend server:
-   python3 app.py
+   `python3 app.py`
    
 To start the frontend, follow these steps:
 
 1. Navigate to the `/patrolplanner` directory.
 2. Run the following command to start the frontend server:
-   npm start
+   `npm start`
 
 
 ## Usage
