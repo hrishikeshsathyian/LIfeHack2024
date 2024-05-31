@@ -5,7 +5,6 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
 import 'leaflet-draw';
 import '../styles.css'; // Import custom CSS file
-import HeatmapLayer from './HeatMapComponent'; 
 
 const MapComponent = ({ onMapConstantChange, heatmapData }) => {
   const drawnItemsRef = useRef(new L.FeatureGroup());
@@ -60,7 +59,7 @@ const MapComponent = ({ onMapConstantChange, heatmapData }) => {
   return (
     <div>
       <div className="controls">
-        <h2>Select a Rectangle on the Map</h2>
+        <h2>PATROL PLANNER</h2>
       </div>
       <MapContainer
         center={[1.3521, 103.8198]} // Center on Singapore

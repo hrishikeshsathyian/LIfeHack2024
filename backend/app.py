@@ -1,71 +1,61 @@
-# Filename - app.py
- 
-# Import flask and datetime module for showing date and time
-from flask import Flask, request, jsonify, Response
-from flask_cors import CORS
-import datetime
-import heatmap
- 
-x = datetime.datetime.now()
-
-# Initializing flask app
+import logging
+from flask import Flask, request, jsonify
+from route_optimiser import *
+import os
+# Initialize Flask app
 app = Flask(__name__)
 
-CORS(app, resources={
-    r"/upload": {
-        "origins": ["http://localhost:3000"],  # Whitelist the frontend origin
-        "methods": ["POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
-@app.route('/upload', methods=['POST', 'OPTIONS'])
-def upload_csv():
-    if request.method == 'OPTIONS':
-        response = jsonify()
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        response = Response(heatmap_data)
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
+# Ensure the uploaded_files directory exists
+UPLOAD_DIR = 'uploaded_files'
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'csvFile' not in request.files:
+        logging.error("No file part in the request")
+        return jsonify({"error": "No file part"}), 400
     
-    try:
-        file = request.files['csvFile']  # Access the file sent from frontend
-        topRightLat = float(request.form.get('topRightLat'))
-        topRightLng = float(request.form.get('topRightLng'))
-        bottomLeftLat = float(request.form.get('bottomLeftLat'))
-        bottomLeftLng = float(request.form.get('bottomLeftLng'))
-        topRight = [topRightLat, topRightLng]
-        bottomLeft = [bottomLeftLat, bottomLeftLng]
+    file = request.files['csvFile']
+    if file.filename == '':
+        logging.error("No selected file")
+        return jsonify({"error": "No selected file"}), 400
+    
+    if file:
+        try:
+            # Save file
+            file_path = os.path.join("uploaded_files", file.filename)
+            file.save(file_path)
 
-        # Call your heatmap function
-        grid_coords, z_values = heatmap.generate_heatmap(file, topRight, bottomLeft)
+            # Get additional form data
+            top_right_lat = float(request.form['topRightLat'])
+            top_right_lng = float(request.form['topRightLng'])
+            bottom_left_lat = float(request.form['bottomLeftLat'])
+            bottom_left_lng = float(request.form['bottomLeftLng'])
+            num_patrols = int(request.form['numPatrols'])
+            
+            upper_right = (top_right_lat, top_right_lng)
+            bottom_left = (bottom_left_lat, bottom_left_lng)
+            severity_weight = 1.5
+            time_weight = 0.1
+            n_clusters = num_patrols
+            output_dir = 'plot_images'
+            
+            os.makedirs(output_dir, exist_ok=True)
 
-        # Prepare data for sending back to frontend
-        heatmap_data = {
-            'gridCoords': grid_coords.tolist(),
-            'zValues': z_values.tolist()
-        }
-        return jsonify(heatmap_data)
+            rectangles, grid_coords, heatmap_values, cluster_labels, cluster_centers = get_cluster_rectangles(file_path, upper_right, bottom_left, severity_weight, time_weight, n_clusters, output_dir)
+            plot_osmnx_map_with_rectangles(grid_coords, rectangles, output_dir, "osmnx_map")
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500  # Handle errors gracefully
- 
-# Route for seeing a data
-@app.route('/data')
-def get_time():
- 
-    # Returning an api for showing in  reactjs
-    return {
-        'Name':"geek", 
-        "Age":"22",
-        "Date":x, 
-        "programming":"python"
-        }
- 
-# Running app
+            for i, rectangle in enumerate(rectangles):
+                plot_osmnx_map_with_intensity_route(grid_coords, heatmap_values, rectangle, output_dir, f"osmnx_intensity_route_{i}")
+
+            logging.info("Files processed and plots created successfully")
+            return jsonify({"message": "Files processed and plots created successfully"}), 200
+
+        except Exception as e:
+            logging.error("Error processing file: %s", str(e))
+            return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)

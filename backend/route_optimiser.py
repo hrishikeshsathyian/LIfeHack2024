@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 from datetime import datetime
 from sklearn.neighbors import KernelDensity
 from sklearn.cluster import KMeans
@@ -259,20 +261,22 @@ def plot_osmnx_map_with_intensity_route(grid_coords, heatmap_values, rectangle, 
     plt.close()
 
 
-# Define your file path where you want to save the plots
-output_dir = 'plot_images'
 
-# Create the output directory if it doesn't exist
-os.makedirs(output_dir, exist_ok=True)
-# Example usage
-file_path = '/Users/hrishikeshsathyian/Documents/GitHub/LIfeHack2024/backend/stats/fake_crime_data_north_singapore_1000.csv'
-upper_right = (1.4700, 103.9500)
-bottom_left = (1.3500, 103.8200)
-severity_weight = 1.5
-time_weight = 0.1
-n_clusters = 3
-rectangles, grid_coords, heatmap_values, cluster_labels, cluster_centers = get_cluster_rectangles(file_path, upper_right, bottom_left, severity_weight, time_weight, n_clusters, output_dir)
-rectangles = plot_osmnx_map_with_rectangles(grid_coords, rectangles, output_dir, "osmnx_map")
+if __name__ == '__main__':
+    output_dir = 'plot_images'
 
-for i, rectangle in enumerate(rectangles):
-    plot_osmnx_map_with_intensity_route(grid_coords, heatmap_values, rectangle, output_dir, f"osmnx_intensity_route_{i}")
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    # Example usage
+    file_path = '/Users/hrishikeshsathyian/Documents/GitHub/LIfeHack2024/backend/stats/fake_crime_data_north_singapore_1000.csv'
+    upper_right = (1.4700, 103.9500)
+    bottom_left = (1.3500, 103.8200)
+    severity_weight = 1.5
+    time_weight = 0.1
+    n_clusters = 3
+    rectangles, grid_coords, heatmap_values, cluster_labels, cluster_centers = get_cluster_rectangles(file_path, upper_right, bottom_left, severity_weight, time_weight, n_clusters, output_dir)
+    rectangles = plot_osmnx_map_with_rectangles(grid_coords, rectangles, output_dir, "osmnx_map")
+
+    for i, rectangle in enumerate(rectangles):
+        plot_osmnx_map_with_intensity_route(grid_coords, heatmap_values, rectangle, output_dir, f"osmnx_intensity_route_{i}")
+

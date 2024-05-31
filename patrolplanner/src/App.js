@@ -28,19 +28,13 @@ function App() {
       formData.append("topRightLng", mapCoordinates.northEast.lng);
       formData.append("bottomLeftLat", mapCoordinates.southWest.lat);
       formData.append("bottomLeftLng", mapCoordinates.southWest.lng);
+      formData.append("numPatrols", numOfPatrols);
       console.log("FormData:", Array.from(formData.entries()));
       const response = await fetch("http://127.0.0.1:5000/upload", {
         method: "POST",
         body: formData,
       });
       const data = await response.json();
-      if (response.ok) {
-        console.log("Heatmap data obtained");
-        setHeatmapData(data); // Update state with heatmap data
-      } else {
-        console.log("Issue getting response");
-        console.error("Error:", data.error); // Handle errors
-      }
     } catch (error) {
       console.error("Network Error:", error);
     }
