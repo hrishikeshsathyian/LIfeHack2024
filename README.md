@@ -37,6 +37,8 @@ To start the frontend, follow these steps:
 3. Import a CSV file containing fake crime data with the following headers: `lat`, `long`, `date`, `severity` (where severity ranges from 1 to 10).
 4. Click the "Import .csv" button to import the crime data.
 5. The application will suggest optimal patrol routes based on the imported data and other parameters and these suggestions will be downloaded into a folder called plot_images in the root directory.
+6. Open the file plot_images from your file explorer to obtain the relevant images
+7. **BUG**: if some images become faulty/distorted after multiple executions of the program, try clearing cache or restarting front and backend servers to solve the issue
 
 ## Contributing
 
