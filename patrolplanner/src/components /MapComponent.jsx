@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, Rectangle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
@@ -63,6 +63,48 @@ const MapComponent = () => {
     }
   };
 
+  const GridLayer = () => {
+    const map = useMap();
+    const [gridCells, setGridCells] = useState([]);
+    const [center, setCenter] = useState(map.getCenter()); // Store initial center
+  
+    useEffect(() => {
+      const updateGrid = () => {
+        const bounds = L.latLngBounds( // Create bounds around center
+          [center.lat - 0.1, center.lng - 0.1],  // Adjust these values for grid size
+          [center.lat + 0.1, center.lng + 0.1]
+        );
+        const cellSize = 500;
+  
+        const cells = [];
+        for (let x = bounds.getWest(); x < bounds.getEast(); x += cellSize / 100000) {
+          for (let y = bounds.getSouth(); y < bounds.getNorth(); y += cellSize / 100000) {
+            cells.push(
+              <Rectangle
+                key={`${x}-${y}`}
+                bounds={[[y, x], [y + cellSize / 100000, x + cellSize / 100000]]}
+                pathOptions={{ weight: 1, color: '#000000', fillOpacity: 0 }}
+              />
+            );
+          }
+        }
+        setGridCells(cells);
+      };
+  
+      updateGrid();
+  
+      // Only update on zoom change
+      map.on('zoomend', updateGrid); 
+      map.on('moveend', updateGrid);
+  
+      return () => {
+        map.off('zoomend', updateGrid);
+      };
+    }, [map, center]);  // Include center in dependency array
+  
+    return <>{gridCells}</>;
+  };
+
   return (
     <div>
       <div className="controls">
@@ -80,6 +122,7 @@ const MapComponent = () => {
           attribution="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
         />
         <DrawControl />
+        <GridLayer />
       </MapContainer>
     </div>
   );
