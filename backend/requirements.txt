@@ -1,9 +1,0 @@
-Flask==3.0.3
-geopandas==0.14.4
-matplotlib==3.9.0
-networkx==3.3
-numpy==1.26.4
-osmnx==1.9.3
-pandas==2.2.2
-scikit_learn==1.4.2
-Shapely==2.0.4
