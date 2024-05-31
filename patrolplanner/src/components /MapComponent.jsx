@@ -1,13 +1,13 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
 import 'leaflet-draw';
 import '../styles.css'; // Import custom CSS file
+import HeatmapLayer from './HeatMapComponent'; 
 
-const MapComponent = () => {
-  const [rectangleCoordinates, setRectangleCoordinates] = useState(null);
+const MapComponent = ({ onMapConstantChange, heatmapData }) => {
   const drawnItemsRef = useRef(new L.FeatureGroup());
 
   const DrawControl = () => {
@@ -37,7 +37,9 @@ const MapComponent = () => {
         const { layer } = e;
         drawnItems.addLayer(layer);
         const { _northEast, _southWest } = layer.getBounds();
-        setRectangleCoordinates({
+    
+        // Send coordinates to App.js as soon as they're drawn
+        onMapConstantChange({
           northEast: _northEast,
           southWest: _southWest,
         });
@@ -55,25 +57,16 @@ const MapComponent = () => {
     return null;
   };
 
-  const handleSubmit = () => {
-    if (rectangleCoordinates) {
-      console.log('Rectangle Coordinates:', rectangleCoordinates);
-    } else {
-      console.log('No rectangle drawn');
-    }
-  };
-
   return (
     <div>
       <div className="controls">
         <h2>Select a Rectangle on the Map</h2>
-        <button onClick={handleSubmit}>Submit</button>
       </div>
       <MapContainer
         center={[1.3521, 103.8198]} // Center on Singapore
         zoom={13}
         id="map"
-        style={{ height: '80vh', width: '80%', margin: 'auto' }}
+        style={{ height: '80vh', width: '100%', margin: 'auto' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
