@@ -35,6 +35,8 @@ def define_rectangles(grid_coords, cluster_labels, k):
         upper_left = (lat_max, lon_min)
         bottom_right = (lat_min, lon_max)
         rectangles.append((upper_left, bottom_right))
+        
+    
     return rectangles
 
 

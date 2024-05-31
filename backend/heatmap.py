@@ -4,13 +4,7 @@ from sklearn.neighbors import KernelDensity
 import numpy as np
 import matplotlib.pyplot as plt
 
-import pandas as pd
-from datetime import datetime
-from sklearn.neighbors import KernelDensity
-import numpy as np
-import matplotlib.pyplot as plt
-
-def generate_heatmap(file_path, upper_left, bottom_right, severity_weight=1.5, time_weight=0.1):
+def generate_heatmap(file_path, upper_right, bottom_left, severity_weight=1.5, time_weight=0.1):
     # Load the data from the CSV file
     crime_data = pd.read_csv(file_path, parse_dates=['time'])
 
@@ -33,10 +27,10 @@ def generate_heatmap(file_path, upper_left, bottom_right, severity_weight=1.5, t
     # Calculate the weighted intensity by multiplying severity with the time weight
     crime_data['weighted_intensity'] = crime_data['severity'] * severity_weight * crime_data['time_weight']
 
-    # Filter the data within the given rectangular grid
+    # Filter the data within the given rectangular grid using upper right and bottom left coordinates
     crime_data = crime_data[
-        (crime_data['latitude'] >= bottom_right[0]) & (crime_data['latitude'] <= upper_left[0]) &
-        (crime_data['longitude'] >= upper_left[1]) & (crime_data['longitude'] <= bottom_right[1])
+        (crime_data['latitude'] >= bottom_left[0]) & (crime_data['latitude'] <= upper_right[0]) &
+        (crime_data['longitude'] >= bottom_left[1]) & (crime_data['longitude'] <= upper_right[1])
     ]
 
     # Remove any crimes with zero weights (no contribution to the weighted intensity)
@@ -68,4 +62,13 @@ def generate_heatmap(file_path, upper_left, bottom_right, severity_weight=1.5, t
 
     return grid_coords, z
 
+# Example usage with adjusted weights
+file_path = 'backend/stats/fake_crime_data_north_singapore_1000.csv'
+upper_right = (1.4700, 103.9500)  # Example coordinates for the upper right corner
+bottom_left = (1.3500, 103.8200)  # Example coordinates for the bottom left corner
 
+# Adjust the weights for severity and time
+severity_weight = 1.5
+time_weight = 0.1
+
+grid_coords, z = generate_heatmap(file_path, upper_right, bottom_left, severity_weight, time_weight)
