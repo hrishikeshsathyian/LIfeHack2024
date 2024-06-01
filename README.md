@@ -36,8 +36,8 @@ To start the frontend, follow these steps:
 ## Usage
 
 1. Once the application is running, open it in your web browser.
-2. Click on the box on the left side of the map to highlight the grid area to patrol.
-3. Import a CSV file containing fake crime data with the following headers: `lat`, `long`, `date`, `severity` (where severity ranges from 1 to 10).
+2. Click on the black square box on the left side of the map to highlight the grid area to patrol.
+3. Import a CSV file containing fake crime data with the following headers: `lat`, `long`, `date`, `severity` (where severity ranges from 1 to 10), and input number of patrols
 4. Click the "Import .csv" button to import the crime data. => **sample csv files have been provided in additional information section of submission**
 5. The application will suggest optimal patrol routes based on the imported data and other parameters
 6. The relevant data and images will be downloaded into a folder called plot_images in the ROOT DIRECTORY.
