@@ -17,6 +17,9 @@ To install the necessary dependencies, follow these steps:
 
 ## Starting the Servers
 
+For the app to work, both the backend and frontend server must be running CONCURRENTLY. Start the servers on separate terminals.
+
+
 To start the backend server, follow these steps:
 
 1. Navigate to the `/backend` directory.
